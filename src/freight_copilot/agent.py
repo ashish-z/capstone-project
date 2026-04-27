@@ -23,7 +23,8 @@ from freight_copilot.memory import (
     now,
 )
 from freight_copilot.memory.intent import classify as classify_intent
-from freight_copilot.prompts.system import SYSTEM_PROMPT
+from freight_copilot.prompts.personas import DEFAULT_PERSONA, get_persona
+from freight_copilot.prompts.system import build_system_prompt
 from freight_copilot.safety import scan_response
 from freight_copilot.session_logger import (
     SafetyFindingRecord,
@@ -63,6 +64,7 @@ def build_agent(
     model: str | None = None,
     checkpointer: MemorySaver | None = None,
     use_rag: bool = True,
+    persona: str | None = None,
 ):
     """Construct the LangGraph ReAct agent.
 
@@ -71,6 +73,8 @@ def build_agent(
         checkpointer: Inject a custom checkpointer (else fresh MemorySaver).
         use_rag: If False, the search_sops tool is omitted — used by the
             Phase 4 ablation run to measure RAG's contribution.
+        persona: One of "ops_associate" / "finance_partner" / "customer_lead".
+            Falls back to DEFAULT_PERSONA on miss.
     """
     llm = ChatAnthropic(
         model=model or DEFAULT_MODEL,
@@ -81,7 +85,7 @@ def build_agent(
     return create_react_agent(
         model=llm,
         tools=tools,
-        prompt=SYSTEM_PROMPT,
+        prompt=build_system_prompt(persona),
         checkpointer=checkpointer or MemorySaver(),
     )
 
@@ -99,19 +103,36 @@ class AgentSession:
         thread_id: str | None = None,
         model: str | None = None,
         use_rag: bool = True,
+        persona: str | None = None,
     ) -> None:
         self.thread_id = thread_id or uuid.uuid4().hex[:12]
         self.model = model or DEFAULT_MODEL
         self.use_rag = use_rag
+        self.persona = (persona or DEFAULT_PERSONA)
+        # Validate persona at construction so a bad name fails fast.
+        get_persona(self.persona)
         self.checkpointer = MemorySaver()
         self.agent = build_agent(
             model=self.model,
             checkpointer=self.checkpointer,
             use_rag=use_rag,
+            persona=self.persona,
         )
         self.logger = SessionLogger(self.thread_id)
         self._turn_index = 0
         self._config = {"configurable": {"thread_id": self.thread_id}}
+
+    def set_persona(self, persona_name: str) -> None:
+        """Switch persona mid-session. Rebuilds the agent (new system prompt)
+        but keeps the same checkpointer so message history persists."""
+        get_persona(persona_name)  # validates
+        self.persona = persona_name
+        self.agent = build_agent(
+            model=self.model,
+            checkpointer=self.checkpointer,
+            use_rag=self.use_rag,
+            persona=persona_name,
+        )
 
     def stream_turn(self, user_input: str) -> Iterator[dict[str, Any]]:
         """Run one turn, yielding structured events for the CLI to render.
@@ -128,6 +149,7 @@ class AgentSession:
             turn_index=self._turn_index,
             user_input=user_input,
             model=self.model,
+            persona=self.persona,
         )
         turn_started_ms = now_ms()
 

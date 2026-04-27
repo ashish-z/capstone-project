@@ -2,7 +2,7 @@
 
 Multi-turn loop with visible tool calls, intent classification, safety
 findings, and JSONL session logging. Each turn shows the classified intent
-inline so the user can see how the copilot is interpreting their input.
+inline. Switch personas mid-session with `/role <name>` (try `/role` to list).
 """
 
 from __future__ import annotations
@@ -11,12 +11,13 @@ import json
 import sys
 
 from freight_copilot.agent import AgentSession
+from freight_copilot.prompts.personas import list_personas
 
 BANNER = """
 ================================================================
   Freight Operations Triage Copilot
   Type your question. Use Ctrl-D, 'exit', or 'quit' to end.
-  Type '/reset' to start a fresh session.
+  Commands: /reset  /role <name>  /role  (lists personas)
 ================================================================
 """
 
@@ -50,11 +51,22 @@ def _print_event(event: dict) -> None:
         print(f"\n[error] {event['message']}", file=sys.stderr)
 
 
+def _print_personas() -> None:
+    print("\n  Available personas:")
+    for p in list_personas():
+        print(f"    {p.name:18s} {p.role_label:35s} — {p.description}")
+
+
+def _session_header(session: AgentSession) -> None:
+    print(f"  session: {session.thread_id}  (persona: {session.persona})")
+    print(f"  log:     logs/session-{session.thread_id}.jsonl")
+
+
 def main() -> int:
     print(BANNER)
     session = AgentSession()
-    print(f"  session: {session.thread_id}")
-    print(f"  log:     logs/session-{session.thread_id}.jsonl\n")
+    _session_header(session)
+    _print_personas()
 
     while True:
         try:
@@ -69,8 +81,22 @@ def main() -> int:
             print("bye.")
             return 0
         if user_input == "/reset":
-            session = AgentSession()
-            print(f"  new session: {session.thread_id}")
+            session = AgentSession(persona=session.persona)
+            print()
+            _session_header(session)
+            continue
+        if user_input.startswith("/role"):
+            parts = user_input.split(maxsplit=1)
+            if len(parts) == 1:
+                _print_personas()
+                print(f"  current: {session.persona}")
+                continue
+            new_persona = parts[1].strip()
+            try:
+                session.set_persona(new_persona)
+                print(f"  ✓ persona switched to '{session.persona}'")
+            except Exception as exc:  # noqa: BLE001
+                print(f"  [error] {exc}", file=sys.stderr)
             continue
 
         try:
