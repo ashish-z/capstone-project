@@ -22,6 +22,7 @@ from freight_copilot.session_logger import (
 )
 from freight_copilot.tools.carrier_history import carrier_history
 from freight_copilot.tools.external_events import external_events
+from freight_copilot.tools.search_sops import search_sops
 from freight_copilot.tools.shipment_lookup import lookup_shipment
 
 # override=True so the project's .env wins over any stale empty-valued
@@ -30,19 +31,36 @@ load_dotenv(override=True)
 
 DEFAULT_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001")
 
-ALL_TOOLS = [lookup_shipment, carrier_history, external_events]
+# Data tools that ground facts about a specific shipment / carrier / port.
+DATA_TOOLS = [lookup_shipment, carrier_history, external_events]
+# Policy tool — RAG over the SOP corpus. Toggleable for the with-vs-without
+# comparison run in Phase 4 evaluation.
+RAG_TOOLS = [search_sops]
+ALL_TOOLS = [*DATA_TOOLS, *RAG_TOOLS]
 
 
-def build_agent(model: str | None = None, checkpointer: MemorySaver | None = None):
-    """Construct the LangGraph ReAct agent with memory and 3 tools."""
+def build_agent(
+    model: str | None = None,
+    checkpointer: MemorySaver | None = None,
+    use_rag: bool = True,
+):
+    """Construct the LangGraph ReAct agent.
+
+    Args:
+        model: Override the default Claude model.
+        checkpointer: Inject a custom checkpointer (else fresh MemorySaver).
+        use_rag: If False, the search_sops tool is omitted — used by the
+            Phase 4 ablation run to measure RAG's contribution.
+    """
     llm = ChatAnthropic(
         model=model or DEFAULT_MODEL,
         temperature=0,
         max_tokens=2048,
     )
+    tools = ALL_TOOLS if use_rag else DATA_TOOLS
     return create_react_agent(
         model=llm,
-        tools=ALL_TOOLS,
+        tools=tools,
         prompt=SYSTEM_PROMPT,
         checkpointer=checkpointer or MemorySaver(),
     )
@@ -56,11 +74,21 @@ class AgentSession:
     structured turn records for evaluation.
     """
 
-    def __init__(self, thread_id: str | None = None, model: str | None = None) -> None:
+    def __init__(
+        self,
+        thread_id: str | None = None,
+        model: str | None = None,
+        use_rag: bool = True,
+    ) -> None:
         self.thread_id = thread_id or uuid.uuid4().hex[:12]
         self.model = model or DEFAULT_MODEL
+        self.use_rag = use_rag
         self.checkpointer = MemorySaver()
-        self.agent = build_agent(model=self.model, checkpointer=self.checkpointer)
+        self.agent = build_agent(
+            model=self.model,
+            checkpointer=self.checkpointer,
+            use_rag=use_rag,
+        )
         self.logger = SessionLogger(self.thread_id)
         self._turn_index = 0
         self._config = {"configurable": {"thread_id": self.thread_id}}
