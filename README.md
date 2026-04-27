@@ -17,7 +17,7 @@
 | 5 | Real test data + safeguards | ✅ done |
 | 6 | Long-term memory & intent recognition | ✅ done |
 | 7 | Adaptive behavior (role + tone) | ✅ done |
-| 8 | Deploy + monitor (Streamlit) | ⏳ pending |
+| 8 | Deploy + monitor (Streamlit) | ✅ done |
 | 9 | Evaluation framework | ⏳ pending |
 
 ---
@@ -83,11 +83,12 @@ python -c "from freight_copilot import __version__; print(__version__)"
 ## Run
 
 ```bash
-# CLI agent (Phase 2+)
-python -m freight_copilot.agent
+# Streamlit app (Phase 8) — main UI: Triage Console + Monitoring + Sessions
+PYTHONPATH=src streamlit run app/streamlit_app.py
+# → http://localhost:8501
 
-# Streamlit app (Phase 8)
-streamlit run app/streamlit_app.py
+# CLI agent (Phase 2+) — same agent, terminal interface
+PYTHONPATH=src python -m freight_copilot
 ```
 
 ---

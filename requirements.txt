@@ -34,3 +34,7 @@ datasets>=3.0.0
 pytest>=8.0.0
 pytest-asyncio>=0.24.0
 ruff>=0.8.0
+# Used by eval/capture_screenshots.py to capture the Streamlit demo pages
+# in headless mode. Optional for runtime — only the screenshot script needs
+# it. Pinned loosely; install browser with `python -m playwright install chromium`.
+playwright>=1.45.0
