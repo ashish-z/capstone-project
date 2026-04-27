@@ -1,0 +1,38 @@
+[project]
+name = "freight-copilot"
+version = "0.1.0"
+description = "IITM Applied AI capstone — Freight Operations Exception Triage Copilot"
+authors = [{ name = "Ashish Zanwar", email = "ashish.zanwar@freightify.com" }]
+requires-python = ">=3.12,<3.13"
+readme = "README.md"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests", "app", "eval"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "F",    # pyflakes
+    "W",    # pycodestyle warnings
+    "I",    # isort
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "SIM",  # flake8-simplify
+]
+ignore = [
+    "E501",  # line-too-long (we let formatter handle)
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+asyncio_mode = "auto"

@@ -216,3 +216,17 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Project-specific
+chroma_db/
+data/embeddings_cache/
+*.db
+.langsmith/
+demo_screenshots/*.png
+!demo_screenshots/.gitkeep
+
