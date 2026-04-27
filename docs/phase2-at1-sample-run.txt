@@ -1,0 +1,74 @@
+========================================================================
+AT-1 (Customs hold, missing CI) — single-turn run on Haiku 4.5
+========================================================================
+
+USER PROMPT:
+Triage shipment FRT-1042 for me. What is wrong and what should I do next? Draft a customer email if appropriate.
+
+------------------------------------------------------------------------
+AGENT RESPONSE:
+------------------------------------------------------------------------
+---
+
+## DIAGNOSIS
+
+FRT-1042 is held in US Customs at New York due to a **missing Commercial Invoice**. The vessel arrived on schedule (2026-04-25), container discharged the same day, but customs clearance is blocked pending this critical document. The shipper (Aurora Textiles) has not yet provided it to the broker. This is a straightforward documentation gap with a tight window: the customer SLA breach threshold is 3 days away, and demurrage accrual begins in 4 days.
+
+---
+
+## KEY FACTS
+
+- **Current Status:** HELD – Customs (per broker note 2026-04-26 12:18 UTC)
+- **Root Cause:** Commercial Invoice missing (per documents record and broker note)
+- **Vessel & Arrival:** MAERSK SENTOSA, arrived USNYC 2026-04-25 08:11 UTC, discharged same day
+- **Customer:** Brookline Apparel Co (Gold tier, 4-hour SLA acknowledgment window)
+- **SLA Breach Risk:** 2026-04-29 00:00 UTC (3 days from now)
+- **Demurrage Risk:** Accrues at $175/day starting 2026-04-30 00:00 UTC (4 days from now)
+- **Other Docs:** Packing list, B/L, Certificate of Origin, and ISF filing all in place
+
+---
+
+## RECOMMENDED ACTIONS (ranked)
+
+1. **Contact shipper (Aurora Textiles) immediately** — request Commercial Invoice be sent to broker within 2 hours. Expected resolution: **2–4 hours** if shipper has it ready; risk: **high** if shipper is unresponsive or invoice is not yet issued.
+
+2. **Escalate to broker (Continental Customs Broker)** — confirm they have shipper contact details and are actively chasing. Ask for ETA on receipt and any alternative clearance pathways (e.g., conditional release pending invoice). Expected resolution: **4–8 hours**; risk: **medium** (broker may have limited leverage with shipper).
+
+3. **Prepare customer notification** — draft and queue (do not send yet) a message to Brookline Apparel explaining the hold, expected timeline, and demurrage risk. Send only after action 1 shows progress or stalls. Expected resolution: **transparency**; risk: **low** (manages expectations).
+
+---
+
+## DOWNSTREAM IMPACT
+
+- **SLA Breach:** Customer SLA threshold breached in **3 days** (2026-04-29 00:00 UTC). Gold-tier customer; escalation likely if missed.
+- **Demurrage Accrual:** Begins 2026-04-30 at $175/day. Each day of hold costs $175 in terminal charges.
+- **Vessel Cutoff:** Not applicable (cargo already discharged).
+
+---
+
+## DRAFT — CUSTOMER COMMUNICATION
+
+**Subject:** FRT-1042 – Customs Hold Update & Expected Resolution Timeline
+
+Dear Brookline Apparel Co,
+
+We are writing to inform you of a temporary hold on your shipment FRT-1042 (MBL MAEU240118245) at the Port of New York.
+
+**Status:** Your container arrived on schedule on 2026-04-25 and has been discharged. However, US Customs has placed a hold pending receipt of the Commercial Invoice from the shipper (Aurora Textiles). This is a standard documentation requirement and does not indicate any compliance issue.
+
+**Current Action:** We are actively contacting the shipper to expedite the invoice submission to our customs broker. We expect this document to be received and processed within the next 2–4 hours, which would clear the hold by end of business today.
+
+**Timeline & Costs:** Should the hold extend beyond 2026-04-30, terminal demurrage charges of $175/day will begin to accrue. We are prioritizing resolution to avoid this.
+
+**Next Steps:** We will provide a status update within 4 hours. If you have any questions or can assist in expediting the invoice from your supplier, please let us know immediately.
+
+Thank you for your patience.
+
+Best regards,  
+[Your Name]  
+Freight Operations
+
+---
+
+**⚠️ Do not send this email yet.** Wait for action 1 (shipper contact) to show progress or stall. If the invoice arrives within 2 hours, send a brief "resolved" note instead. If shipper is unresponsive after 2 hours, send this draft to set expectations.
+------------------------------------------------------------------------

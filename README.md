@@ -10,8 +10,8 @@
 
 | Phase | Description | Status |
 |---|---|---|
-| 1 | Problem framing & success metrics | 🟡 in progress |
-| 2 | Basic working agent (LLM + tool) | ⏳ pending |
+| 1 | Problem framing & success metrics | ✅ done |
+| 2 | Basic working agent (LLM + tool) | ✅ done |
 | 3 | Tools + multi-turn memory | ⏳ pending |
 | 4 | Knowledge & retrieval (RAG) | ⏳ pending |
 | 5 | Real test data + safeguards | ⏳ pending |

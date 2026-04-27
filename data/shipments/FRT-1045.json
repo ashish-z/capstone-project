@@ -1,0 +1,62 @@
+{
+  "shipment_id": "FRT-1045",
+  "mode": "FCL",
+  "service": "Port-to-Port",
+  "incoterm": "FOB",
+  "container_count": 1,
+  "container_type": "40HC",
+  "origin": {
+    "port_code": "SGSIN",
+    "port_name": "Singapore",
+    "country": "Singapore"
+  },
+  "destination": {
+    "port_code": "AUMEL",
+    "port_name": "Melbourne, Australia",
+    "country": "Australia"
+  },
+  "carrier": "Evergreen",
+  "vessel": "EVER GIVEN",
+  "voyage": "V.062S",
+  "mbl_number": "EGLVSINMEL7732",
+  "hbl_number": "ZNVAAUMEL1045",
+  "etd": "2026-04-12",
+  "eta": "2026-04-24",
+  "shipper": {
+    "name": "Singapore Electronics Pte Ltd",
+    "country": "Singapore"
+  },
+  "consignee": {
+    "name": "Melbourne Tech Distributors",
+    "country": "Australia"
+  },
+  "customer": {
+    "name": "Melbourne Tech Distributors",
+    "tier": "Platinum",
+    "sla_ack_hours": 2
+  },
+  "current_status": "ETA SLIPPED - No Update",
+  "exception_summary": "ETA already past (24-Apr). Last carrier tracking event 36+ hours ago. No carrier notification received.",
+  "documents": {
+    "commercial_invoice": "RECEIVED",
+    "packing_list": "RECEIVED",
+    "bill_of_lading": "RECEIVED",
+    "certificate_of_origin": "RECEIVED"
+  },
+  "tracking_events": [
+    {"ts": "2026-04-12T06:00:00Z", "event": "Vessel departed SGSIN", "source": "carrier"},
+    {"ts": "2026-04-18T11:20:00Z", "event": "Vessel passed Lombok Strait", "source": "carrier"},
+    {"ts": "2026-04-25T22:00:00Z", "event": "AIS ping — vessel position 38.4°S 144.5°E (~120nm SW of Melbourne)", "source": "ais_external"}
+  ],
+  "carrier_notes": [],
+  "downstream_constraints": {
+    "customer_sla_breach_at": "2026-04-26T00:00:00Z",
+    "demurrage_starts_at": "2026-04-30T00:00:00Z",
+    "demurrage_rate_usd_per_day": 195
+  },
+  "carrier_contact": {
+    "ops_email": "evergreen.ops.sin@evergreen-line.com",
+    "ops_phone": "+65-6516-1212",
+    "escalation_email": "regional-ops-apac@evergreen-line.com"
+  }
+}

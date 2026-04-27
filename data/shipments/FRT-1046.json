@@ -1,0 +1,67 @@
+{
+  "shipment_id": "FRT-1046",
+  "mode": "LCL",
+  "service": "Port-to-Door",
+  "incoterm": "DAP",
+  "container_count": 0,
+  "container_type": "LCL Consol",
+  "origin": {
+    "port_code": "CNSHA",
+    "port_name": "Shanghai, China",
+    "country": "China"
+  },
+  "destination": {
+    "port_code": "GBFXT",
+    "port_name": "Felixstowe, UK",
+    "country": "United Kingdom"
+  },
+  "carrier": "COSCO",
+  "vessel": "COSCO HARMONY",
+  "voyage": "V.099W",
+  "mbl_number": "COSU640012211",
+  "hbl_number": "ZNVAGBFX1046",
+  "etd": "2026-03-28",
+  "eta": "2026-04-26",
+  "shipper": {
+    "name": "Shanghai Precision Tools Co",
+    "country": "China"
+  },
+  "consignee_on_hbl": {
+    "name": "ACME Inc.",
+    "address": "12 Old Kent Road, London SE1 4AB, UK",
+    "country": "United Kingdom"
+  },
+  "consignee_on_mbl": {
+    "name": "ACME Inc Ltd.",
+    "address": "12 Old Kent Road, London SE1 4AB, UK",
+    "country": "United Kingdom"
+  },
+  "customer": {
+    "name": "ACME Inc.",
+    "tier": "Silver",
+    "sla_ack_hours": 8
+  },
+  "current_status": "HELD - Doc Discrepancy",
+  "exception_summary": "Consignee name mismatch between House BL (ACME Inc.) and Master BL (ACME Inc Ltd.). Release blocked at destination agent.",
+  "documents": {
+    "commercial_invoice": "RECEIVED",
+    "packing_list": "RECEIVED",
+    "house_bill_of_lading": "RECEIVED",
+    "master_bill_of_lading": "RECEIVED",
+    "certificate_of_origin": "RECEIVED"
+  },
+  "tracking_events": [
+    {"ts": "2026-03-28T12:00:00Z", "event": "Cargo gated in at CNSHA CFS", "source": "carrier"},
+    {"ts": "2026-03-30T05:00:00Z", "event": "Vessel departed CNSHA", "source": "carrier"},
+    {"ts": "2026-04-25T16:30:00Z", "event": "Vessel arrived GBFXT", "source": "carrier"},
+    {"ts": "2026-04-26T09:15:00Z", "event": "Doc discrepancy flagged at destination agent — HBL/MBL consignee mismatch", "source": "destination_agent"}
+  ],
+  "carrier_notes": [
+    {"ts": "2026-04-26T09:30:00Z", "from": "release@cosco-uk.com", "text": "Cannot release. HBL says 'ACME Inc.' but MBL says 'ACME Inc Ltd.' Same address but legal entities differ on paper. Need amendment from origin or LOI."}
+  ],
+  "downstream_constraints": {
+    "customer_sla_breach_at": "2026-04-29T00:00:00Z",
+    "demurrage_starts_at": "2026-05-02T00:00:00Z",
+    "demurrage_rate_usd_per_day": 95
+  }
+}

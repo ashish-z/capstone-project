@@ -1,0 +1,67 @@
+{
+  "shipment_id": "FRT-1044",
+  "mode": "FCL",
+  "service": "Port-to-Port",
+  "incoterm": "FOB",
+  "container_count": 1,
+  "container_type": "20GP",
+  "origin": {
+    "port_code": "VNSGN",
+    "port_name": "Ho Chi Minh City, Vietnam",
+    "country": "Vietnam"
+  },
+  "destination": {
+    "port_code": "DEHAM",
+    "port_name": "Hamburg, Germany",
+    "country": "Germany"
+  },
+  "carrier": "MSC",
+  "vessel": "MSC ALPHA",
+  "voyage": "V.123N",
+  "rolled_to_vessel": "MSC BETA",
+  "rolled_to_voyage": "V.124N",
+  "mbl_number": "MSCUSGNHAM4412",
+  "hbl_number": "ZNVADEHM1044",
+  "etd_original": "2026-04-22",
+  "etd_after_roll": "2026-04-29",
+  "eta_original": "2026-05-25",
+  "eta_after_roll": "2026-06-02",
+  "shipper": {
+    "name": "Saigon Coffee Exports JSC",
+    "country": "Vietnam"
+  },
+  "consignee": {
+    "name": "Hanseatic Coffee GmbH",
+    "country": "Germany"
+  },
+  "customer": {
+    "name": "Hanseatic Coffee GmbH",
+    "tier": "Gold",
+    "sla_ack_hours": 4,
+    "delivery_promise_at": "2026-05-30T00:00:00Z"
+  },
+  "current_status": "ROLLED",
+  "exception_summary": "Booking rolled by carrier from MSC ALPHA V.123N to MSC BETA V.124N due to vessel overbooking. 7-day delay.",
+  "documents": {
+    "commercial_invoice": "RECEIVED",
+    "packing_list": "RECEIVED",
+    "bill_of_lading": "PENDING",
+    "certificate_of_origin": "RECEIVED"
+  },
+  "tracking_events": [
+    {"ts": "2026-04-15T10:00:00Z", "event": "Booking confirmed — MSC ALPHA V.123N", "source": "carrier"},
+    {"ts": "2026-04-20T07:30:00Z", "event": "Container gated in at VNSGN", "source": "carrier"},
+    {"ts": "2026-04-21T22:14:00Z", "event": "Booking rolled to MSC BETA V.124N — vessel overbooking", "source": "carrier"}
+  ],
+  "carrier_notes": [
+    {"ts": "2026-04-21T22:20:00Z", "from": "ops@msc.com", "text": "Apologies for the roll. ALPHA V.123N is overcommitted on this lane. New ETA Hamburg 02-Jun-2026 on BETA V.124N."}
+  ],
+  "lane_alternatives": [
+    {"carrier": "Hapag-Lloyd", "vessel": "HL EXPRESS", "voyage": "V.231N", "etd": "2026-04-26", "eta": "2026-05-29", "rate_usd": 2150, "historical_reliability_pct": 92},
+    {"carrier": "CMA CGM", "vessel": "CMA AURORA", "voyage": "V.108N", "etd": "2026-04-28", "eta": "2026-06-01", "rate_usd": 1980, "historical_reliability_pct": 88}
+  ],
+  "downstream_constraints": {
+    "customer_sla_breach_at": "2026-05-30T00:00:00Z",
+    "vessel_cutoff_at": "2026-04-28T18:00:00Z"
+  }
+}

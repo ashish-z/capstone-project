@@ -1,0 +1,63 @@
+{
+  "shipment_id": "FRT-1042",
+  "mode": "FCL",
+  "service": "Port-to-Port",
+  "incoterm": "FOB",
+  "container_count": 1,
+  "container_type": "40HC",
+  "origin": {
+    "port_code": "INNSA",
+    "port_name": "Nhava Sheva, India",
+    "country": "India"
+  },
+  "destination": {
+    "port_code": "USNYC",
+    "port_name": "New York, USA",
+    "country": "United States"
+  },
+  "carrier": "Maersk",
+  "vessel": "MAERSK SENTOSA",
+  "voyage": "V.412W",
+  "mbl_number": "MAEU240118245",
+  "hbl_number": "ZNVAUSNY1042",
+  "etd": "2026-04-08",
+  "eta": "2026-04-26",
+  "shipper": {
+    "name": "Aurora Textiles Pvt Ltd",
+    "country": "India"
+  },
+  "consignee": {
+    "name": "Brookline Apparel Co",
+    "country": "United States"
+  },
+  "customer": {
+    "name": "Brookline Apparel Co",
+    "tier": "Gold",
+    "sla_ack_hours": 4
+  },
+  "current_status": "HELD - Customs",
+  "exception_summary": "US Customs hold pending Commercial Invoice. Broker queue blocked.",
+  "documents": {
+    "commercial_invoice": "MISSING",
+    "packing_list": "RECEIVED",
+    "bill_of_lading": "RECEIVED",
+    "certificate_of_origin": "RECEIVED",
+    "isf_filing": "FILED"
+  },
+  "tracking_events": [
+    {"ts": "2026-04-08T03:14:00Z", "event": "Empty container picked up at INNSA", "source": "carrier"},
+    {"ts": "2026-04-08T19:42:00Z", "event": "Loaded on board MAERSK SENTOSA at INNSA", "source": "carrier"},
+    {"ts": "2026-04-09T02:00:00Z", "event": "Vessel departed INNSA", "source": "carrier"},
+    {"ts": "2026-04-25T08:11:00Z", "event": "Vessel arrived USNYC", "source": "carrier"},
+    {"ts": "2026-04-25T17:30:00Z", "event": "Container discharged at terminal", "source": "carrier"},
+    {"ts": "2026-04-26T11:05:00Z", "event": "Customs hold issued — missing commercial invoice", "source": "broker"}
+  ],
+  "carrier_notes": [
+    {"ts": "2026-04-26T12:18:00Z", "from": "broker@continental-cb.com", "text": "Hold flagged. Need commercial invoice from shipper. Broker queue is paused for this MBL."}
+  ],
+  "downstream_constraints": {
+    "customer_sla_breach_at": "2026-04-29T00:00:00Z",
+    "demurrage_starts_at": "2026-04-30T00:00:00Z",
+    "demurrage_rate_usd_per_day": 175
+  }
+}

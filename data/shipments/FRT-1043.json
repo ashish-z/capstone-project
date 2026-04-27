@@ -1,0 +1,70 @@
+{
+  "shipment_id": "FRT-1043",
+  "mode": "FCL",
+  "service": "Port-to-Port",
+  "incoterm": "CIF",
+  "container_count": 2,
+  "container_type": "40GP",
+  "origin": {
+    "port_code": "CNNGB",
+    "port_name": "Ningbo, China",
+    "country": "China"
+  },
+  "destination": {
+    "port_code": "USHOU",
+    "port_name": "Houston, USA",
+    "country": "United States"
+  },
+  "carrier": "ONE",
+  "vessel": "ONE COMMITMENT",
+  "voyage": "V.087E",
+  "mbl_number": "ONEYNGBHOU0987",
+  "hbl_number": "ZNVAUSHOU1043",
+  "etd": "2026-04-02",
+  "eta": "2026-04-23",
+  "shipper": {
+    "name": "Ningbo Industrial Equipment Co",
+    "country": "China"
+  },
+  "consignee": {
+    "name": "Lonestar Manufacturing LLC",
+    "country": "United States"
+  },
+  "customer": {
+    "name": "Lonestar Manufacturing LLC",
+    "tier": "Silver",
+    "sla_ack_hours": 8
+  },
+  "current_status": "DELAYED - External Event",
+  "exception_summary": "Houston port closed due to severe storm. ETA slipped 5+ days.",
+  "documents": {
+    "commercial_invoice": "RECEIVED",
+    "packing_list": "RECEIVED",
+    "bill_of_lading": "RECEIVED",
+    "certificate_of_origin": "RECEIVED",
+    "isf_filing": "FILED"
+  },
+  "tracking_events": [
+    {"ts": "2026-04-02T08:00:00Z", "event": "Vessel departed CNNGB", "source": "carrier"},
+    {"ts": "2026-04-22T14:00:00Z", "event": "Vessel arrived US waters; awaiting berth", "source": "carrier"},
+    {"ts": "2026-04-23T02:30:00Z", "event": "Port of Houston closed — Tropical Storm Hermes", "source": "port_authority"},
+    {"ts": "2026-04-25T18:00:00Z", "event": "Port still closed; vessel anchored offshore", "source": "carrier"}
+  ],
+  "external_events": [
+    {
+      "type": "weather",
+      "source": "NOAA Storm Bulletin #14",
+      "summary": "Tropical Storm Hermes — Port of Houston closed for safety. Reopen window: 27–28 Apr pending wind subsidence.",
+      "url": "https://www.nhc.noaa.gov/bulletin/hermes-14"
+    }
+  ],
+  "carrier_notes": [
+    {"ts": "2026-04-23T05:10:00Z", "from": "ops@one-line.com", "text": "Vessel safely anchored. Awaiting port reopening. Will rebroadcast ETA once berth slot is confirmed."}
+  ],
+  "downstream_constraints": {
+    "customer_sla_breach_at": null,
+    "vessel_cutoff_at": null,
+    "demurrage_starts_at": "2026-05-01T00:00:00Z",
+    "demurrage_rate_usd_per_day": 220
+  }
+}
