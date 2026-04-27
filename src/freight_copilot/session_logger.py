@@ -47,6 +47,7 @@ class TurnRecord:
     safety_findings: list[SafetyFindingRecord] = field(default_factory=list)
     intent: str | None = None
     intent_confidence: float | None = None
+    persona: str | None = None
 
 
 class SessionLogger:

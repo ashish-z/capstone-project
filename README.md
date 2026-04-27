@@ -16,7 +16,7 @@
 | 4 | Knowledge & retrieval (RAG) | ✅ done |
 | 5 | Real test data + safeguards | ✅ done |
 | 6 | Long-term memory & intent recognition | ✅ done |
-| 7 | Adaptive behavior (role + tone) | ⏳ pending |
+| 7 | Adaptive behavior (role + tone) | ✅ done |
 | 8 | Deploy + monitor (Streamlit) | ⏳ pending |
 | 9 | Evaluation framework | ⏳ pending |
 
