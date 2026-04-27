@@ -25,6 +25,13 @@ class ToolCallRecord:
 
 
 @dataclass
+class SafetyFindingRecord:
+    pattern_name: str
+    severity: str
+    matched_text: str
+
+
+@dataclass
 class TurnRecord:
     ts: float
     thread_id: str
@@ -37,6 +44,7 @@ class TurnRecord:
     output_tokens: int | None = None
     model: str | None = None
     error: str | None = None
+    safety_findings: list[SafetyFindingRecord] = field(default_factory=list)
 
 
 class SessionLogger:

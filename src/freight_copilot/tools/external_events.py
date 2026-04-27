@@ -7,6 +7,8 @@ from pathlib import Path
 
 from langchain_core.tools import tool
 
+from freight_copilot.tools.models import PortEvents, PortNotCovered
+
 _REPO_ROOT = Path(__file__).resolve().parents[3]
 _EVENTS_FILE = _REPO_ROOT / "data" / "external_events.json"
 
@@ -33,14 +35,13 @@ def external_events(port_code: str) -> str:
     payload = json.loads(_EVENTS_FILE.read_text(encoding="utf-8"))
     port_data = payload["ports"].get(port_code)
     if port_data is None:
-        return json.dumps(
-            {
-                "error": "port_not_covered",
-                "port_code": port_code,
-                "message": (
-                    f"No external-events feed configured for '{port_code}'. "
-                    "Treat this as 'no signal' rather than 'no events'."
-                ),
-            }
-        )
-    return json.dumps({"port_code": port_code, **port_data})
+        return PortNotCovered(
+            port_code=port_code,
+            message=(
+                f"No external-events feed configured for '{port_code}'. "
+                "Treat this as 'no signal' rather than 'no events'."
+            ),
+        ).model_dump_json()
+
+    events = PortEvents.model_validate({"port_code": port_code, **port_data})
+    return events.model_dump_json(exclude_none=False)

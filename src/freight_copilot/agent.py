@@ -1,4 +1,4 @@
-"""LangGraph ReAct agent — Phase 3: tools + multi-turn memory + session logging."""
+"""LangGraph ReAct agent — tools, multi-turn memory, session logging, output safety scan."""
 
 from __future__ import annotations
 
@@ -14,7 +14,9 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import create_react_agent
 
 from freight_copilot.prompts.system import SYSTEM_PROMPT
+from freight_copilot.safety import scan_response
 from freight_copilot.session_logger import (
+    SafetyFindingRecord,
     SessionLogger,
     ToolCallRecord,
     TurnRecord,
@@ -184,6 +186,32 @@ class AgentSession:
                 turn.output_tokens = usage.get("output_tokens")
 
             turn.final_response = final_text
+
+            # Output safety scan — runs after the LLM finishes.
+            report = scan_response(final_text)
+            turn.safety_findings = [
+                SafetyFindingRecord(
+                    pattern_name=f.pattern_name,
+                    severity=f.severity,
+                    matched_text=f.matched_text,
+                )
+                for f in report.findings
+            ]
+            if report.has_any:
+                yield {
+                    "type": "safety",
+                    "summary": report.summary_line(),
+                    "findings": [
+                        {
+                            "pattern": f.pattern_name,
+                            "severity": f.severity,
+                            "matched": f.matched_text,
+                            "description": f.description,
+                        }
+                        for f in report.findings
+                    ],
+                }
+
             yield {"type": "final", "text": final_text}
 
         except Exception as exc:  # noqa: BLE001 — surface and log all failures

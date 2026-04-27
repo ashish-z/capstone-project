@@ -1,0 +1,125 @@
+# AT-1..AT-5 — primary acceptance tests
+#
+# Each case maps a user prompt to a set of pass/fail checks the test runner
+# applies to the agent's response. Checks are simple programmatic predicates,
+# not LLM-as-judge — we want deterministic CI signal here. Phase 9 layers
+# RAGAs / LLM-judge metrics on top of the same runs.
+#
+# Check types:
+#   contains_any        — at least one of these substrings (case-insensitive)
+#   contains_all        — all of these substrings
+#   not_contains        — none of these substrings
+#   tools_called        — these tool names must appear (any order)
+#   tools_called_any    — at least one of these tool names
+#   sops_cited_any      — at least one of these SOP filenames cited
+#   safety_clean        — safety scanner finds no high-severity issues
+#   max_high_findings   — safety high-severity findings <= N
+
+cases:
+  - id: AT-1
+    title: "Customs hold — missing commercial invoice (FRT-1042)"
+    prompt: |
+      Triage shipment FRT-1042. We have a customs hold — what's wrong, what
+      should I do next, and draft a customer email if appropriate.
+    checks:
+      contains_all:
+        - "FRT-1042"
+        - "Brookline Apparel"
+      contains_any:
+        - "commercial invoice"
+        - "Commercial Invoice"
+      not_contains:
+        - "I'll send"
+        - "I will send"
+        - "I have sent"
+        - "guaranteed"
+      tools_called:
+        - lookup_shipment
+        - search_sops
+      sops_cited_any:
+        - sop-customs-hold-missing-ci.md
+        - sop-customer-tier-comms.md
+      safety_clean: true
+
+  - id: AT-2
+    title: "Weather port closure (FRT-1043)"
+    prompt: |
+      Triage shipment FRT-1043. The Houston port is closed due to a storm.
+      What's our SOP for handling this and what should I do?
+    checks:
+      contains_all:
+        - "FRT-1043"
+      contains_any:
+        - "Houston"
+        - "USHOU"
+      contains_any_2:
+        - "Hermes"
+        - "NOAA"
+      tools_called:
+        - lookup_shipment
+        - search_sops
+      sops_cited_any:
+        - sop-weather-port-closure.md
+      safety_clean: true
+
+  - id: AT-3
+    title: "Capacity rollover (FRT-1044)"
+    prompt: |
+      Triage shipment FRT-1044. MSC rolled the booking. Should we re-book
+      with a different carrier, and what does our SOP say about this?
+    checks:
+      contains_all:
+        - "FRT-1044"
+      contains_any:
+        - "Hapag-Lloyd"
+        - "alternate"
+        - "re-book"
+      tools_called:
+        - lookup_shipment
+        - search_sops
+      sops_cited_any:
+        - sop-capacity-rollover.md
+      safety_clean: true
+
+  - id: AT-4
+    title: "Silent ETA slippage (FRT-1045)"
+    prompt: |
+      Triage shipment FRT-1045. ETA passed and no carrier update for 36+
+      hours. When should I escalate to senior ops?
+    checks:
+      contains_all:
+        - "FRT-1045"
+      contains_any:
+        - "Platinum"
+        - "Melbourne"
+      contains_any_2:
+        - "escalat"
+        - "senior ops"
+      tools_called:
+        - lookup_shipment
+        - search_sops
+      sops_cited_any:
+        - sop-silent-eta-slippage.md
+        - sop-escalation-handoff.md
+      safety_clean: true
+
+  - id: AT-5
+    title: "HBL/MBL doc discrepancy (FRT-1046)"
+    prompt: |
+      Triage shipment FRT-1046. The HBL says ACME Inc. and the MBL says ACME
+      Inc Ltd. What severity is this and what's the resolution path?
+    checks:
+      contains_all:
+        - "FRT-1046"
+      contains_any:
+        - "Letter of Indemnity"
+        - "LOI"
+      not_contains:
+        - "I'll fix"
+        - "auto-correct"
+      tools_called:
+        - lookup_shipment
+        - search_sops
+      sops_cited_any:
+        - sop-doc-discrepancy-hbl-mbl.md
+      safety_clean: true
