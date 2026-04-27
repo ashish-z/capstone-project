@@ -1,8 +1,8 @@
 """CLI entry point: `python -m freight_copilot`.
 
-Phase 3 ships a multi-turn loop with visible tool calls and per-session JSONL
-logging. The same session (= one thread_id) preserves message history across
-turns, so the user can ask follow-up questions naturally.
+Multi-turn loop with visible tool calls, intent classification, safety
+findings, and JSONL session logging. Each turn shows the classified intent
+inline so the user can see how the copilot is interpreting their input.
 """
 
 from __future__ import annotations
@@ -14,7 +14,7 @@ from freight_copilot.agent import AgentSession
 
 BANNER = """
 ================================================================
-  Freight Operations Triage Copilot — Phase 3 (multi-turn)
+  Freight Operations Triage Copilot
   Type your question. Use Ctrl-D, 'exit', or 'quit' to end.
   Type '/reset' to start a fresh session.
 ================================================================
@@ -23,7 +23,12 @@ BANNER = """
 
 def _print_event(event: dict) -> None:
     etype = event["type"]
-    if etype == "tool_call":
+    if etype == "intent":
+        print(
+            f"  [intent] {event['intent']}  "
+            f"(confidence={event['confidence']:.2f}, margin={event['margin']:.2f})"
+        )
+    elif etype == "tool_call":
         args = json.dumps(event["args"], ensure_ascii=False)
         print(f"  [tool→]  {event['name']}({args})")
     elif etype == "tool_result":
