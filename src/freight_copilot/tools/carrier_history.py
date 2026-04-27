@@ -7,6 +7,8 @@ from pathlib import Path
 
 from langchain_core.tools import tool
 
+from freight_copilot.tools.models import LaneHistory, LaneNotFound
+
 _REPO_ROOT = Path(__file__).resolve().parents[3]
 _LANE_HISTORY_FILE = _REPO_ROOT / "data" / "lane_history.json"
 
@@ -36,15 +38,14 @@ def carrier_history(lane: str) -> str:
     payload = json.loads(_LANE_HISTORY_FILE.read_text(encoding="utf-8"))
     lane_data = payload["lanes"].get(lane)
     if lane_data is None:
-        return json.dumps(
-            {
-                "error": "lane_not_found",
-                "lane": lane,
-                "message": (
-                    f"No carrier history on file for lane '{lane}'. "
-                    "Verify the port codes against the shipment record."
-                ),
-                "lanes_available": list(payload["lanes"].keys()),
-            }
-        )
-    return json.dumps({"lane": lane, **lane_data})
+        return LaneNotFound(
+            lane=lane,
+            message=(
+                f"No carrier history on file for lane '{lane}'. "
+                "Verify the port codes against the shipment record."
+            ),
+            lanes_available=list(payload["lanes"].keys()),
+        ).model_dump_json()
+
+    history = LaneHistory.model_validate({"lane": lane, **lane_data})
+    return history.model_dump_json(exclude_none=False)

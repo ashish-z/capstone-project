@@ -14,7 +14,7 @@
 | 2 | Basic working agent (LLM + tool) | ✅ done |
 | 3 | Tools + multi-turn memory | ✅ done |
 | 4 | Knowledge & retrieval (RAG) | ✅ done |
-| 5 | Real test data + safeguards | ⏳ pending |
+| 5 | Real test data + safeguards | ✅ done |
 | 6 | Long-term memory & intent recognition | ⏳ pending |
 | 7 | Adaptive behavior (role + tone) | ⏳ pending |
 | 8 | Deploy + monitor (Streamlit) | ⏳ pending |

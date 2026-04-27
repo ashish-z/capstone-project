@@ -7,6 +7,8 @@ from pathlib import Path
 
 from langchain_core.tools import tool
 
+from freight_copilot.tools.models import ShipmentNotFound, ShipmentRecord
+
 # Resolve relative to repo root so it works from any CWD.
 _REPO_ROOT = Path(__file__).resolve().parents[3]
 _SHIPMENTS_DIR = _REPO_ROOT / "data" / "shipments"
@@ -31,14 +33,16 @@ def lookup_shipment(shipment_id: str) -> str:
     """
     fixture = _SHIPMENTS_DIR / f"{shipment_id}.json"
     if not fixture.exists():
-        return json.dumps(
-            {
-                "error": "shipment_not_found",
-                "shipment_id": shipment_id,
-                "message": (
-                    f"No shipment record found for '{shipment_id}'. "
-                    "Verify the ID with the user before proceeding."
-                ),
-            }
-        )
-    return fixture.read_text(encoding="utf-8")
+        return ShipmentNotFound(
+            shipment_id=shipment_id,
+            message=(
+                f"No shipment record found for '{shipment_id}'. "
+                "Verify the ID with the user before proceeding."
+            ),
+        ).model_dump_json()
+
+    raw = json.loads(fixture.read_text(encoding="utf-8"))
+    # Validate at the tool boundary — a malformed fixture should fail loudly,
+    # not silently propagate to the agent's reasoning.
+    record = ShipmentRecord.model_validate(raw)
+    return record.model_dump_json(exclude_none=False)

@@ -32,6 +32,15 @@ def _print_event(event: dict) -> None:
         print("\n" + "-" * 64)
         print(event["text"])
         print("-" * 64)
+    elif etype == "safety":
+        # Show safety findings between the tool calls and the final response.
+        print(f"\n  ⚠ {event['summary']}")
+        for f in event["findings"]:
+            sev_marker = "✗" if f["severity"] == "high" else "!"
+            print(
+                f"  {sev_marker} [{f['severity']}] {f['pattern']}: "
+                f"{f['matched'][:80]!r}"
+            )
     elif etype == "error":
         print(f"\n[error] {event['message']}", file=sys.stderr)
 
