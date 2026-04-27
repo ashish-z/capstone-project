@@ -225,6 +225,7 @@ __marimo__/
 # Project-specific
 chroma_db/
 data/embeddings_cache/
+data/memory.sqlite3
 *.db
 .langsmith/
 demo_screenshots/*.png

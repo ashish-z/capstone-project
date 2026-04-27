@@ -1,0 +1,188 @@
+Re-seeding long-term memory db with historical notes…
+Seeded: {'customer_notes': 6, 'shipment_notes': 2, 'corrections': 2}
+
+============================================================================
+SESSION A — thread_id=271e415bcfcb
+============================================================================
+
+────────── A.1 ──────────
+USER: Triage shipment FRT-1042. Quick — what should I do next?
+
+  [intent]  triage_request  (conf=0.77, margin=0.32)
+  [tool→]   lookup_shipment({'shipment_id': 'FRT-1042'})
+  [tool→]   recall_shipment_history({'shipment_id': 'FRT-1042'})
+  [tool←]   recall_shipment_history: {
+  "shipment_id": "FRT-1042",
+  "notes": [
+    {
+      "ts": 1745613600.0,
+      "shipment_id": "FRT-1042",
+      "note": "Customs hold opened 2026-04-26. Ship…
+  [tool→]   recall_customer_history({'customer_name': 'Brookline Apparel Co'})
+  [tool→]   search_sops({'query': 'customs hold missing commercial invoice escalation', 'k': 4})
+  [tool←]   search_sops: {
+  "query": "customs hold missing commercial invoice escalation",
+  "k": 4,
+  "results": [
+    {
+      "source": "sop-customs-hold-missing-ci.md",
+      "chunk…
+
+  AGENT:
+    ---
+    
+    ## DIAGNOSIS
+    
+    **FRT-1042 is held at US Customs pending a Commercial Invoice from the shipper (Aurora Textiles Pvt Ltd).** The container arrived at USNYC on 2026-04-25, was discharged, and the hold was issued 2026-04-26 11:05 UTC. A prior contact attempt to the shipper at 12:30 UTC received only an auto-reply. **Demurrage begins in 4 days (2026-04-30) at $175/day, and the customer's SLA breach window closes 2026-04-29.** This is a documentation issue, not a compliance risk — the CI must come from the shipper.
+    
+    ---
+    
+    ## KEY FACTS
+    
+    - **Hold reason:** Missing Commercial Invoice (source: broker note 2026-04-26 11:05 UTC)
+    - **Shipper:** Aurora Textiles Pvt Ltd (India) — historically slow on CI (4–6h response per customer history, 2026-04-13)
+    - **Consignee:** Brookline Apparel Co (Gold tier, 4-hour SLA)
+    - **Demurrage clock:** Starts 2026-04-30 00:00 UTC; $175/day (source: `downstream_constraints`)
+    - **Customer SLA breach:** 2026-04-29 00:00 UTC (source: `downstream_constraints.customer_sla_breach_at`)
+    - **Preferred contact:** procurement@brookline-apparel.com (per correction, 2026-04-20)
+    - **All other docs received:** Packing List, Bill of Lading, Certificate of Origin, ISF filing all marked RECEIVED
+    
+    ---
+    
+    ## APPLICABLE SOPs
+    
+    - **sop-customs-hold-missing-ci.md** — Step-by-step playbook for missing CI holds, including shipper contact template, consignee notification, and escalation triggers.
+    
+    ---
+    
+    ## RECOMMENDED ACTIONS (ranked by urgency & resolution time)
+    
+    1. **Contact shipper (Aurora Textiles) immediately — within 1 hour**  
+       Expected resolution: 4–6 hours (per customer history, shipper is slow on CI).  
+       Risk: **Medium** — shipper may not respond quickly; escalation may be needed.  
+       Rationale: Per sop-customs-hold-missing-ci.md §Step 1, shipper contact must happen within 1 hour. Request the CI as PDF and confirmation it matches Packing List and Bill of Lading. Do NOT offer to estimate values yourself.
+    
+    2. **Notify Brookline Apparel (consignee) of the hold and demurrage risk — within 4 hours**  
+       Expected resolution: Immediate (notification only; may unlock shipper contact from consignee side).  
+       Risk: **Low** — required by SLA and SOP.  
+       Rationale: Per sop-customs-hold-missing-ci.md §Step 2 and customer history (2026-04-19), Brookline prefers 4-hour update cadence. Use the SOP template below, sent to **procurement@brookline-apparel.com** (per correction, 2026-04-20). Be honest about demurrage risk; do not promise a release time.
+    
+    3. **If shipper does not respond by 2026-04-27 06:00 UTC (24h window), escalate to shipper's manager**  
+       Expected resolution: 2–4 hours post-escalation.  
+       Risk: **High** — demurrage clock is ticking; only 3 days until accrual begins.  
+       Rationale: Per sop-customs-hold-missing-ci.md, escalation to shipper management is the next step if the documentation desk is unresponsive. Cite the demurrage start date and customer SLA breach date in the escalation.
+    
+    ---
+    
+    ## DOWNSTREAM IMPACT
+    
+    - **Customer SLA breach:** 2026-04-29 00:00 UTC (3 days from now). Brookline Apparel is Gold tier; per customer history, they expect 4-hour updates.
+    - **Demurrage accrual:** Begins 2026-04-30 00:00 UTC at $175/day. If the hold extends 5+ days, demurrage exposure is ~$875+.
+    - **Vessel cutoff:** Not applicable (shipment already discharged).
+    
+    ---
+    
+    ## DRAFT — CUSTOMER COMMUNICATION
+    
+    **To:** procurement@brookline-apparel.com  
+    **Subject:** FRT-1042 — Customs Hold Update & Demurrage Risk
+    
+    Dear Brookline Apparel Co,
+    
+    Your shipment **FRT-1042** (1×40HC, MAEU240118245) arrived at New York on **2026-04-25** and was placed on customs hold pending receipt of the Commercial Invoice from your supplier, Aurora Textiles Pvt Ltd.
+    
+    **This is a documentation requirement, not a compliance issue.** We have contacted Aurora Textiles to request the Commercial Invoice immediately. We will provide an update within 4 hours.
+    
+    **Important:** Terminal demurrage charges of **$175/day** will begin to accrue on **2026-04-30** if the hold is not released by then. If you can assist in expediting the Commercial Invoice from Aurora Textiles, please let us know immediately.
+    
+    We will follow up by end of day with a status update.
+    
+    Best regards,  
+    Freight Operations Team
+    
+    ---
+    
+    **Next step:** Contact Aurora Textiles' documentation desk now. If you need their contact details, let me know.
+
+────────── A.2 ──────────
+USER: Actually, Brookline Apparel got promoted to Platinum tier last week, not Gold. Update for any future triages.
+
+  [intent]  correction  (conf=0.43, margin=0.19)
+  [tool→]   search_sops({'query': 'Platinum tier customer SLA acknowledgment response time escalation', 'k': 4})
+  [tool←]   search_sops: {
+  "query": "Platinum tier customer SLA acknowledgment response time escalation",
+  "k": 4,
+  "results": [
+    {
+      "source": "sop-capacity-rollover.md",
+  …
+
+  AGENT:
+    ---
+    
+    **Updated guidance for FRT-1042 with Platinum tier:**
+    
+    | Item | Gold (old) | Platinum (new) |
+    |------|-----------|-----------------|
+    | **Acknowledgment SLA** | 4 hours | **2 hours** |
+    | **Update cadence** | Every 8 hours | **Every 4 hours** |
+    | **Resolution comm** | Within 2 hours | **Within 1 hour** |
+    
+    **Revised Action 2:**
+    
+    **Notify Brookline Apparel (consignee) of the hold — within 2 hours (Platinum SLA)**  
+    Expected resolution: Immediate (notification only).  
+    Risk: **Low** — required by SLA.  
+    Rationale: Per sop-customer-tier-comms.md, Platinum tier has a **2-hour acknowledgment SLA**. Send to **procurement@brookline-apparel.com** using the SOP template. Plan for **4-hour update cadence** (not 8-hour) during the hold resolution.
+    
+    **Also:** Once the shipper responds with the CI (expected 4–6 hours per history), you'll need to notify Brookline of release **within 1 hour** (Platinum resolution SLA), not 2 hours.
+    
+    The correction is now recorded for all future triages of Brookline Apparel Co. ✓
+
+[Session A complete. Correction persisted to memory db.]
+
+============================================================================
+SESSION B — thread_id=571b96097d3d
+============================================================================
+
+────────── B.1 ──────────
+USER: Looking at FRT-1042 again. Anything I should know about this customer that affects how I triage?
+
+  [intent]  triage_request  (conf=0.54, margin=0.28)
+  [tool→]   lookup_shipment({'shipment_id': 'FRT-1042'})
+  [tool←]   lookup_shipment: {"shipment_id":"FRT-1042","mode":"FCL","carrier":"Maersk","current_status":"HELD - Customs","exception_summary":"US Customs hold pending Commercial Invoice. Bro…
+  [tool→]   recall_customer_history({'customer_name': 'Brookline Apparel Co'})
+  [tool←]   recall_customer_history: {
+  "customer_name": "Brookline Apparel Co",
+  "notes": [
+    {
+      "ts": 1745008800.0,
+      "customer_name": "Brookline Apparel Co",
+      "note": "Customer…
+
+  AGENT:
+    ## Key customer context for FRT-1042:
+    
+    **IMPORTANT CORRECTION:** Brookline Apparel Co is **Platinum tier, not Gold** (per correction ts 1777297208, source thread 271e415bcfcb). The shipment record still shows "Gold" — you should treat them as Platinum for SLA and escalation purposes.
+    
+    **Customer-specific quirks:**
+    
+    1. **Preferred contact:** `procurement@brookline-apparel.com` — NOT generic info@ (per correction ts 1745095200). Use this for all exception comms.
+    
+    2. **Preferred update cadence:** They want 4-hour updates even within Platinum's standard SLA (per note ts 1745008800, source hist-2026-04-19). This is tighter than typical — plan for frequent touchpoints.
+    
+    3. **Shipper behavior:** Aurora Textiles Pvt Ltd (the shipper on this shipment) is historically slow on Commercial Invoice — typical 4–6 hour response time (per note ts 1744490400, source hist-2026-04-13). This is directly relevant to your current hold: expect delays when chasing the missing CI.
+    
+    **Downstream pressure:**
+    - Customer SLA breach: **2026-04-29 00:00 UTC** (per shipment record)
+    - Demurrage starts: **2026-04-30 00:00 UTC** at $175/day
+    - You're already 2+ days into the hold; Platinum tier + preferred 4-hour cadence means you need to escalate the shipper contact **immediately** if you haven't already.
+    
+    **Bottom line:** Treat as Platinum, use procurement@brookline-apparel.com, expect slow shipper response on the CI, and plan for frequent updates to the customer.
+
+[Session B complete. Started fresh thread_id=571b96097d3d — no in-process state from A.]
+
+============================================================================
+If Session B mentioned 'Platinum' (or referenced the tier promotion) in its triage, long-term memory worked across sessions.
+  Session A log: logs/session-271e415bcfcb.jsonl
+  Session B log: logs/session-571b96097d3d.jsonl
