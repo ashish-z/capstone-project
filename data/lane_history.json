@@ -1,0 +1,39 @@
+{
+  "_description": "Historical carrier performance by (carrier, lane) over the last 90 days. Used by the carrier_history tool to support recommendation ranking.",
+  "_lane_format": "{origin_port_code}-{destination_port_code}",
+  "lanes": {
+    "INNSA-USNYC": {
+      "carriers": [
+        {"carrier": "Maersk", "shipments": 47, "on_time_pct": 88, "avg_transit_days": 18, "avg_rate_usd_per_40hc": 3200, "common_issues": ["customs delay at NYC", "documentation chase"]},
+        {"carrier": "MSC", "shipments": 39, "on_time_pct": 84, "avg_transit_days": 19, "avg_rate_usd_per_40hc": 3050, "common_issues": ["vessel rolls during peak season"]},
+        {"carrier": "Hapag-Lloyd", "shipments": 22, "on_time_pct": 91, "avg_transit_days": 18, "avg_rate_usd_per_40hc": 3380, "common_issues": []}
+      ]
+    },
+    "CNNGB-USHOU": {
+      "carriers": [
+        {"carrier": "ONE", "shipments": 31, "on_time_pct": 81, "avg_transit_days": 22, "avg_rate_usd_per_40gp": 2750, "common_issues": ["Houston port congestion", "weather-related delays Jun-Oct"]},
+        {"carrier": "Maersk", "shipments": 28, "on_time_pct": 87, "avg_transit_days": 21, "avg_rate_usd_per_40gp": 2890, "common_issues": ["Houston port congestion"]}
+      ]
+    },
+    "VNSGN-DEHAM": {
+      "carriers": [
+        {"carrier": "MSC", "shipments": 52, "on_time_pct": 79, "avg_transit_days": 33, "avg_rate_usd_per_20gp": 1850, "common_issues": ["chronic vessel rollovers on this lane", "Suez routing variance"]},
+        {"carrier": "Hapag-Lloyd", "shipments": 41, "on_time_pct": 92, "avg_transit_days": 32, "avg_rate_usd_per_20gp": 2150, "common_issues": []},
+        {"carrier": "CMA CGM", "shipments": 35, "on_time_pct": 88, "avg_transit_days": 34, "avg_rate_usd_per_20gp": 1980, "common_issues": ["minor schedule slippage Dec-Feb"]}
+      ]
+    },
+    "SGSIN-AUMEL": {
+      "carriers": [
+        {"carrier": "Evergreen", "shipments": 36, "on_time_pct": 85, "avg_transit_days": 12, "avg_rate_usd_per_40hc": 1450, "common_issues": ["occasional silent ETA slippage — carrier slow to update"]},
+        {"carrier": "ANL", "shipments": 29, "on_time_pct": 90, "avg_transit_days": 12, "avg_rate_usd_per_40hc": 1520, "common_issues": []},
+        {"carrier": "OOCL", "shipments": 24, "on_time_pct": 89, "avg_transit_days": 13, "avg_rate_usd_per_40hc": 1480, "common_issues": []}
+      ]
+    },
+    "CNSHA-GBFXT": {
+      "carriers": [
+        {"carrier": "COSCO", "shipments": 44, "on_time_pct": 86, "avg_transit_days": 30, "avg_rate_usd_per_lcl_cbm": 85, "common_issues": ["LCL consol delays at origin CFS"]},
+        {"carrier": "OOCL", "shipments": 33, "on_time_pct": 91, "avg_transit_days": 29, "avg_rate_usd_per_lcl_cbm": 92, "common_issues": []}
+      ]
+    }
+  }
+}

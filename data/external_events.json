@@ -1,0 +1,73 @@
+{
+  "_description": "External events (weather, port closures, strikes, congestion) by port code. Used by the external_events tool to surface non-shipment-specific context.",
+  "ports": {
+    "USHOU": {
+      "port_name": "Houston, USA",
+      "events": [
+        {
+          "type": "weather",
+          "severity": "high",
+          "start_date": "2026-04-23",
+          "end_date_estimated": "2026-04-28",
+          "summary": "Tropical Storm Hermes — port closed for safety. Reopen window 27-28 Apr pending wind subsidence.",
+          "source": "NOAA Storm Bulletin #14",
+          "source_url": "https://www.nhc.noaa.gov/bulletin/hermes-14"
+        }
+      ]
+    },
+    "USNYC": {
+      "port_name": "New York, USA",
+      "events": [
+        {
+          "type": "congestion",
+          "severity": "medium",
+          "start_date": "2026-04-15",
+          "end_date_estimated": "2026-05-10",
+          "summary": "Elevated terminal congestion at APM and Maher terminals. Average truck dwell time +2 hours vs baseline.",
+          "source": "Port Authority of NY/NJ weekly bulletin"
+        }
+      ]
+    },
+    "DEHAM": {
+      "port_name": "Hamburg, Germany",
+      "events": []
+    },
+    "GBFXT": {
+      "port_name": "Felixstowe, UK",
+      "events": [
+        {
+          "type": "labor",
+          "severity": "low",
+          "start_date": "2026-04-20",
+          "end_date_estimated": "2026-04-26",
+          "summary": "Brief work-to-rule action (resolved 26 Apr). No further action expected this quarter.",
+          "source": "Unite the Union bulletin"
+        }
+      ]
+    },
+    "AUMEL": {
+      "port_name": "Melbourne, Australia",
+      "events": []
+    },
+    "INNSA": {
+      "port_name": "Nhava Sheva, India",
+      "events": []
+    },
+    "CNNGB": {
+      "port_name": "Ningbo, China",
+      "events": []
+    },
+    "VNSGN": {
+      "port_name": "Ho Chi Minh City, Vietnam",
+      "events": []
+    },
+    "SGSIN": {
+      "port_name": "Singapore",
+      "events": []
+    },
+    "CNSHA": {
+      "port_name": "Shanghai, China",
+      "events": []
+    }
+  }
+}

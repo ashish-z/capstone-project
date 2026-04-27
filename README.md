@@ -12,7 +12,7 @@
 |---|---|---|
 | 1 | Problem framing & success metrics | ✅ done |
 | 2 | Basic working agent (LLM + tool) | ✅ done |
-| 3 | Tools + multi-turn memory | ⏳ pending |
+| 3 | Tools + multi-turn memory | ✅ done |
 | 4 | Knowledge & retrieval (RAG) | ⏳ pending |
 | 5 | Real test data + safeguards | ⏳ pending |
 | 6 | Long-term memory & intent recognition | ⏳ pending |

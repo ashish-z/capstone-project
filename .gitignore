@@ -229,4 +229,6 @@ data/embeddings_cache/
 .langsmith/
 demo_screenshots/*.png
 !demo_screenshots/.gitkeep
+logs/
+!logs/.gitkeep
 
