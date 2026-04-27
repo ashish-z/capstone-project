@@ -228,8 +228,7 @@ data/embeddings_cache/
 data/memory.sqlite3
 *.db
 .langsmith/
-demo_screenshots/*.png
-!demo_screenshots/.gitkeep
+# demo_screenshots/*.png are committed — they're submission deliverables.
 logs/
 !logs/.gitkeep
 
