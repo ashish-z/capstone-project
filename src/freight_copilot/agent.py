@@ -13,6 +13,16 @@ from langchain_anthropic import ChatAnthropic
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import create_react_agent
 
+import re
+
+from freight_copilot.memory import (
+    Correction,
+    ShipmentNote,
+    add_correction,
+    add_shipment_note,
+    now,
+)
+from freight_copilot.memory.intent import classify as classify_intent
 from freight_copilot.prompts.system import SYSTEM_PROMPT
 from freight_copilot.safety import scan_response
 from freight_copilot.session_logger import (
@@ -24,8 +34,14 @@ from freight_copilot.session_logger import (
 )
 from freight_copilot.tools.carrier_history import carrier_history
 from freight_copilot.tools.external_events import external_events
+from freight_copilot.tools.recall import (
+    recall_customer_history,
+    recall_shipment_history,
+)
 from freight_copilot.tools.search_sops import search_sops
 from freight_copilot.tools.shipment_lookup import lookup_shipment
+
+_SHIPMENT_ID_RE = re.compile(r"\bFRT-\d{4}\b")
 
 # override=True so the project's .env wins over any stale empty-valued
 # env vars inherited from the parent shell. Standard for local dev.
@@ -38,7 +54,9 @@ DATA_TOOLS = [lookup_shipment, carrier_history, external_events]
 # Policy tool — RAG over the SOP corpus. Toggleable for the with-vs-without
 # comparison run in Phase 4 evaluation.
 RAG_TOOLS = [search_sops]
-ALL_TOOLS = [*DATA_TOOLS, *RAG_TOOLS]
+# Memory recall tools — read from data/memory.sqlite3 (Phase 6).
+MEMORY_TOOLS = [recall_customer_history, recall_shipment_history]
+ALL_TOOLS = [*DATA_TOOLS, *RAG_TOOLS, *MEMORY_TOOLS]
 
 
 def build_agent(
@@ -112,6 +130,23 @@ class AgentSession:
             model=self.model,
         )
         turn_started_ms = now_ms()
+
+        # Phase 6 — classify intent before invoking the agent.
+        intent_result = classify_intent(user_input)
+        turn.intent = intent_result.intent
+        turn.intent_confidence = intent_result.confidence
+        yield {
+            "type": "intent",
+            "intent": intent_result.intent,
+            "confidence": intent_result.confidence,
+            "margin": intent_result.margin,
+        }
+
+        # Phase 6 — if this turn is a CORRECTION, persist it before running
+        # the agent so it shows up on next recall.
+        if intent_result.intent == "correction" and intent_result.confidence > 0.40:
+            self._persist_correction(user_input)
+
         # Pending tool calls keyed by tool_call_id, so we can pair the AI-side
         # args with the ToolMessage when it comes back.
         pending: dict[str, dict] = {}
@@ -221,6 +256,104 @@ class AgentSession:
         finally:
             turn.total_duration_ms = now_ms() - turn_started_ms
             self.logger.write(turn)
+            # Phase 6 — write a brief turn summary to long-term memory for
+            # any shipment ID that came up. Customers are derived through
+            # the agent's recall_customer_history tool calls.
+            self._persist_turn_summary(user_input, final_text)
+
+    # ---- Phase 6 helpers ------------------------------------------------
+
+    def _persist_correction(self, user_input: str) -> None:
+        """Persist a correction turn against the most-likely entity:
+          1. Shipment ID if mentioned ('FRT-1042' etc.)
+          2. Customer name if any known customer name substring-matches
+          3. Otherwise 'general' under the thread_id (audit trail only)
+        """
+        ship_id = self._first_shipment_id(user_input)
+        if ship_id:
+            add_correction(
+                Correction(
+                    ts=now(),
+                    entity_kind="shipment",
+                    entity_id=ship_id,
+                    correction=user_input.strip()[:500],
+                    source_thread_id=self.thread_id,
+                )
+            )
+            return
+
+        customer_name = self._known_customer_in_text(user_input)
+        if customer_name:
+            add_correction(
+                Correction(
+                    ts=now(),
+                    entity_kind="customer",
+                    entity_id=customer_name,
+                    correction=user_input.strip()[:500],
+                    source_thread_id=self.thread_id,
+                )
+            )
+            return
+
+        add_correction(
+            Correction(
+                ts=now(),
+                entity_kind="general",
+                entity_id=self.thread_id,
+                correction=user_input.strip()[:500],
+                source_thread_id=self.thread_id,
+            )
+        )
+
+    @staticmethod
+    def _known_customer_in_text(text: str) -> str | None:
+        """Best-effort: any customer that has notes/corrections in the db AND
+        whose name (or a leading n-gram of it) appears in `text`."""
+        from freight_copilot.memory.store import _conn
+
+        text_lc = text.lower()
+        with _conn() as c:
+            rows = c.execute(
+                "SELECT DISTINCT customer_name FROM customer_notes "
+                "UNION SELECT DISTINCT entity_id FROM corrections "
+                "WHERE entity_kind = 'customer'"
+            ).fetchall()
+        candidates = [r[0] for r in rows if r[0]]
+        # Sort longest-first so "ACME Inc Ltd." beats "ACME Inc.".
+        for name in sorted(candidates, key=len, reverse=True):
+            if name.lower() in text_lc:
+                return name
+            # Also try the leading two words ("Brookline Apparel" matches "Brookline Apparel Co")
+            head = " ".join(name.split()[:2]).lower()
+            if len(head) > 6 and head in text_lc:
+                return name
+        return None
+
+    def _persist_turn_summary(self, user_input: str, final_text: str) -> None:
+        """If the turn touched a shipment, write a brief note. The note is
+        the leading paragraph of the response (truncated) — enough to recall
+        what we did without storing the full transcript."""
+        ship_id = self._first_shipment_id(f"{user_input}\n{final_text}")
+        if not ship_id or not final_text:
+            return
+        # Take everything up to the first blank line, truncate to 400 chars.
+        first_para = final_text.split("\n\n", 1)[0].strip().replace("\n", " ")
+        if not first_para:
+            return
+        note = first_para[:400]
+        add_shipment_note(
+            ShipmentNote(
+                ts=now(),
+                shipment_id=ship_id,
+                note=note,
+                source_thread_id=self.thread_id,
+            )
+        )
+
+    @staticmethod
+    def _first_shipment_id(text: str) -> str | None:
+        m = _SHIPMENT_ID_RE.search(text)
+        return m.group(0) if m else None
 
 
 def run_once(user_input: str, model: str | None = None) -> str:

@@ -45,6 +45,8 @@ class TurnRecord:
     model: str | None = None
     error: str | None = None
     safety_findings: list[SafetyFindingRecord] = field(default_factory=list)
+    intent: str | None = None
+    intent_confidence: float | None = None
 
 
 class SessionLogger:
