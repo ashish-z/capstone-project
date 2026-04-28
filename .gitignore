@@ -232,3 +232,8 @@ data/memory.sqlite3
 logs/
 !logs/.gitkeep
 
+
+# Claude Code local state — never commit
+.claude/scheduled_tasks.lock
+.claude/worktrees/
+.claude/settings.local.json

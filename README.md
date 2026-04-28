@@ -186,7 +186,7 @@ ruff format .
 
 ## Author
 
-**Ashish Zanwar** — `ashish.zanwar@freightify.com`
+**Ashish Zanwar** — `useitforstudy@gmail.com`
 IITM Applied AI capstone, 2026.
 
 ## License

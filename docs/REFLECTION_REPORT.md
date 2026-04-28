@@ -1,7 +1,7 @@
 # Reflection Report — Freight Operations Triage Copilot
 
 **IITM Applied AI Capstone**
-**Author:** Ashish Zanwar — `ashish.zanwar@freightify.com`
+**Author:** Ashish Zanwar — `useitforstudy@gmail.com`
 **Date:** 2026-04-27
 **Project:** [github.com/ashish-z/capstone-project](https://github.com/ashish-z/capstone-project)
 

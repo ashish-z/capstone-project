@@ -2,7 +2,7 @@
 name = "freight-copilot"
 version = "0.1.0"
 description = "IITM Applied AI capstone — Freight Operations Exception Triage Copilot"
-authors = [{ name = "Ashish Zanwar", email = "ashish.zanwar@freightify.com" }]
+authors = [{ name = "Ashish Zanwar", email = "useitforstudy@gmail.com" }]
 requires-python = ">=3.12,<3.13"
 readme = "README.md"
 
