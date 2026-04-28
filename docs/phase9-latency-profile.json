@@ -1,0 +1,83 @@
+{
+  "summary": {
+    "n_turns": 4,
+    "total_ms": {
+      "p50": 35015.0,
+      "p95": 38554.0,
+      "avg": 31523.75,
+      "max": 38554.0
+    },
+    "tool_ms": {
+      "p50": 477.0,
+      "p95": 565.0,
+      "avg": 293.5,
+      "share_of_total_pct": 0.9310440540862049
+    },
+    "llm_ms": {
+      "p50": 34450.0,
+      "p95": 38077.0,
+      "avg": 31230.25,
+      "share_of_total_pct": 99.0689559459138
+    },
+    "tokens": {
+      "avg_in": 6514,
+      "avg_out": 1823,
+      "p95_in": 6850,
+      "p95_out": 2048
+    },
+    "tool_count_per_turn": {
+      "avg": 1.75,
+      "max": 2
+    }
+  },
+  "rows": [
+    {
+      "thread_id": "dfb5cb88",
+      "turn_index": 1,
+      "intent": "triage_request",
+      "persona": "ops_associate",
+      "n_tools": 2,
+      "tool_ms": 477.0,
+      "llm_ms": 38077.0,
+      "total_ms": 38554.0,
+      "in_tok": 6850,
+      "out_tok": 1807
+    },
+    {
+      "thread_id": "0393945d",
+      "turn_index": 1,
+      "intent": "triage_request",
+      "persona": "finance_partner",
+      "n_tools": 2,
+      "tool_ms": 73.0,
+      "llm_ms": 26604.0,
+      "total_ms": 26677.0,
+      "in_tok": 6802,
+      "out_tok": 2048
+    },
+    {
+      "thread_id": "ea7e433a",
+      "turn_index": 1,
+      "intent": "triage_request",
+      "persona": "customer_lead",
+      "n_tools": 1,
+      "tool_ms": 59.0,
+      "llm_ms": 25790.0,
+      "total_ms": 25849.0,
+      "in_tok": 6140,
+      "out_tok": 2048
+    },
+    {
+      "thread_id": "ec711a12",
+      "turn_index": 1,
+      "intent": "triage_request",
+      "persona": "ops_associate",
+      "n_tools": 2,
+      "tool_ms": 565.0,
+      "llm_ms": 34450.0,
+      "total_ms": 35015.0,
+      "in_tok": 6266,
+      "out_tok": 1389
+    }
+  ]
+}
