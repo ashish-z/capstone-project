@@ -5,10 +5,12 @@ rails, tools list, and citation rules are identical across roles). Only
 the "who you're talking to" framing, the response emphasis, and the
 proactive behaviors change.
 
-The three personas map to the rubric's required domains:
-  ops_associate    → Tech    (tactical, action-sequencing, SOP-grounded)
-  finance_partner  → Finance (cost framing, demurrage, waivers, rate deltas)
-  customer_lead    → Customer (draft quality, hedging, tone calibration)
+The three personas map to three real-world consumer roles inside a freight
+forwarder (a product design choice; the capstone rubric does not specify
+this list):
+  ops_associate    → Operations Associate    (tactical, action-sequencing, SOP-grounded)
+  finance_partner  → Finance Partner         (cost framing, demurrage, waivers, rate deltas)
+  customer_lead    → Customer Comms Lead     (draft quality, hedging, tone calibration)
 """
 
 from __future__ import annotations

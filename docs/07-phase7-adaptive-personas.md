@@ -1,8 +1,12 @@
 # Phase 7 — Adaptive Behavior (Role + Tone)
 
-**Goal:** Move from "the agent talks the same way to everyone" to **"the agent reframes the same data toward the role of the person it's talking to"** — Tech / Finance / Customer — while keeping every safety rail constant.
+**Goal:** Move from "the agent talks the same way to everyone" to **"the agent reframes the same data toward the role of the person it's talking to"** — ops associate / finance partner / customer-comms lead — while keeping every safety rail constant.
 
-The rubric for this phase calls out three distinct domains (Finance, Customer, Tech) and "more proactive responses." Phase 7 implements both as a single mechanism: composable persona addenda layered on top of the base system prompt.
+### How this maps to the rubric
+
+The capstone brief's literal Phase 7 ask is **feedback-driven adaptation with before/after evidence** (store feedback → modify behavior → demonstrate change → explain). **That capability is satisfied by Phase 6's correction → recall mechanism**: a user correction in Session A is persisted to `data/memory.sqlite3` and applied automatically by a separate Session B — the [cross-session demo trace](phase6-cross-session-trace.txt) is the before/after evidence.
+
+Phase 7 adds an *additional* form of adaptation as a **design choice, not a rubric requirement**: three personas reframing the same data per role. The motivation is product-driven — in a real freight forwarder, the same exception is consumed by ops, finance, and customer-comms colleagues with different priorities, so the agent should reframe accordingly. The mechanism is composable persona addenda layered on top of the base system prompt.
 
 ## What's new vs. Phase 6
 
@@ -16,13 +20,13 @@ The rubric for this phase calls out three distinct domains (Finance, Customer, T
 
 ## The three personas
 
-Mapped to the rubric's required domains:
+These map to three real-world consumer roles inside a freight forwarder — not to a rubric category:
 
-| Persona | Domain | Lead emphasis |
+| Persona | Real-world role | Lead emphasis |
 |---|---|---|
-| `ops_associate` | **Tech** (default) | Tactical triage; full SOP citation; action sequencing with expected resolution times |
-| `finance_partner` | **Finance** | Demurrage exposure, alternate-carrier rate deltas, waiver opportunities, cost-vs-value framing on every recommendation |
-| `customer_lead` | **Customer** | Draft as the centerpiece; tone calibrated to customer tier per `sop-customer-tier-comms.md`; pre-send checklist for Platinum/Gold; tone-calibration explainer |
+| `ops_associate` | **Operations Associate** (default) | Tactical triage; full SOP citation; action sequencing with expected resolution times |
+| `finance_partner` | **Finance / Cost-Recovery Partner** | Demurrage exposure, alternate-carrier rate deltas, waiver opportunities, cost-vs-value framing on every recommendation |
+| `customer_lead` | **Customer Communications Lead** | Draft as the centerpiece; tone calibrated to customer tier per `sop-customer-tier-comms.md`; pre-send checklist for Platinum/Gold; tone-calibration explainer |
 
 Each persona declares:
 - A **role label** (shown in CLI banner)
@@ -132,7 +136,7 @@ The original tempting approach was three separate system prompts (one per person
 Every `TurnRecord` now has a `persona` field. This lets Phase 9 evaluation compare metrics (faithfulness, draft quality, latency) **stratified by persona** — does `customer_lead` produce better-hedged drafts than `ops_associate`? Soon we'll be able to measure.
 
 ### "Proactive" = explicit instruction in the addendum
-The rubric calls for "more proactive responses." Each persona's addendum has a "Proactive:" line that names the behaviors the agent should do unprompted:
+Each persona's addendum has a "Proactive:" line that names behaviors the agent should do unprompted — a design choice to make each persona genuinely useful for its role rather than just stylistically different:
 - `ops_associate`: "Search SOPs proactively for the situation."
 - `finance_partner`: "If demurrage is accruing, **always** compute exposure and surface waiver-eligibility — don't wait for the user to ask."
 - `customer_lead`: "If the customer tier is Platinum or Gold, **always** add a 'what to consider before sending' checklist."

@@ -305,13 +305,15 @@ The base prompt is the **safety contract**. It declares:
 ### Persona addendum (varies)
 
 Three personas are registered in [`personas.py`](../src/freight_copilot/prompts/personas.py),
-each mapped to one of the rubric's required domains:
+each mapped to a real-world consumer role inside a freight forwarder (a
+product design choice — the rubric's literal Phase 7 ask is feedback-driven
+adaptation, satisfied by Phase 6's correction → recall mechanism):
 
-| Persona | Domain | Lead emphasis | Proactive behaviors |
+| Persona | Real-world role | Lead emphasis | Proactive behaviors |
 |---|---|---|---|
-| `ops_associate` | **Tech** (default) | Tactical triage; full SOP citation; action sequencing | Search SOPs proactively; sequence actions with expected resolution times |
-| `finance_partner` | **Finance** | Demurrage exposure, alternate-carrier rate deltas, waiver opportunities | Compute demurrage exposure for next 5 business days automatically; quote rate deltas; flag waiver-eligibility |
-| `customer_lead` | **Customer** | Draft as the centerpiece; tone calibrated to customer tier; pre-send checklist for Platinum/Gold | Add "before-send" checklist for Platinum/Gold; flag overpromising phrases; cite external sources for weather mentions |
+| `ops_associate` | **Operations Associate** (default) | Tactical triage; full SOP citation; action sequencing | Search SOPs proactively; sequence actions with expected resolution times |
+| `finance_partner` | **Finance / Cost-Recovery Partner** | Demurrage exposure, alternate-carrier rate deltas, waiver opportunities | Compute demurrage exposure for next 5 business days automatically; quote rate deltas; flag waiver-eligibility |
+| `customer_lead` | **Customer Communications Lead** | Draft as the centerpiece; tone calibrated to customer tier; pre-send checklist for Platinum/Gold | Add "before-send" checklist for Platinum/Gold; flag overpromising phrases; cite external sources for weather mentions |
 
 `build_system_prompt(persona_name)` composes them: safety rails live entirely
 in the base, so any persona-specific change can never weaken them. Verified
