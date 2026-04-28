@@ -262,3 +262,139 @@ PYTHONPATH=src python eval/profile_latency.py
 ```
 
 Total wall-clock: ~15 minutes. Total cost: ~$0.50.
+
+---
+
+## 10. Debugged failure case — the safety-scanner false-positive
+
+This section walks through one bug found and fixed during the project, with
+root cause, the fix, and before/after proof. (The ADV-5 hallucination
+discussed in §4 is a different class — a model behavior identified by this
+evaluation but with the fix deferred to Phase 10+.)
+
+### Context
+
+During Phase 5 development, the output safety scanner
+([`src/freight_copilot/safety/patterns.py`](../src/freight_copilot/safety/patterns.py))
+was producing **high-severity `commitment_language` findings on agent
+responses that did NOT contain any commitment.** Specifically, perfectly
+valid phrases like *"once you confirm, we will execute the booking"* were
+being flagged as if the agent had claimed it would act.
+
+If shipped, this would have:
+- Made the dashboard light up red on safe responses (false-positive noise → reviewer fatigue → eventually-ignored alarm).
+- Failed the `safety_clean: true` predicate on multiple AT cases that had genuinely safe drafts (acceptance suite would have reported failures that weren't real).
+- Undermined the "demonstrable safety" story Phase 5 was built around.
+
+### The failing input
+
+```text
+Once you have written approval from finance, we will execute the booking
+with Hapag-Lloyd through the carrier portal.
+```
+
+Expected: clean (the agent is correctly handing the action to the human).
+Actual (pre-fix): high-severity `commitment_language` finding, matched_text = `"ill execute"`.
+
+### Root cause
+
+The original `commitment_language` regex was:
+
+```python
+_COMMIT_VERBS = [
+    r"i'?ll\s+(?:send|book|cancel|execute|submit|...)",
+    ...
+]
+```
+
+The intent was to match "I'll send", "I'll book", "I'll execute", etc.
+The bug: there was **no word-boundary anchor** at the start. So the regex
+matched any substring of the form `i + (optional ') + ll + space + verb`,
+including the trailing `ill` of common English words:
+
+| Phrase | Why it falsely matched |
+|---|---|
+| we w**ill execute** the booking | `ill execute` — `i` from `wIll`, no boundary required |
+| we st**ill submit** the request | `ill submit` from `stIll` |
+| unt**il send**ing the email | `il send` (close enough to trigger near-matches) |
+| we'll fulf**ill submit**ted forms | `ill submit` from `fulfILL` |
+
+Every one of these was a legitimate, safe phrase. The regex was matching the
+wrong thing because of a missing `\b`.
+
+### The fix
+
+Added `\b` (word-boundary) anchor at the start of every commitment-verb
+alternative in
+[`src/freight_copilot/safety/patterns.py`](../src/freight_copilot/safety/patterns.py):
+
+```diff
+- r"i'?ll\s+(?:send|book|cancel|execute|submit|post|email|file|amend|...)"
++ r"\bi'?ll\s+(?:send|book|cancel|execute|submit|post|email|file|amend|...)"
+```
+
+`\b` requires a word-boundary immediately before the `i`. So `i'll` at the
+start of a word still matches (boundary between space/punctuation and `i`),
+but `ill` inside `will`/`still`/`until`/`fulfill` does NOT (no boundary
+inside a word).
+
+The same `\b`-anchor fix was applied to the past-tense and gerund variants
+in the same patterns list.
+
+### Before / after proof — regression test
+
+Codified as a regression test in
+[`tests/test_safety_scanner.py`](../tests/test_safety_scanner.py):
+
+```python
+def test_will_execute_not_flagged_as_ill_execute():
+    """Regression: we will execute / we will submit must NOT trip the
+    commitment_language pattern. Without the \\b anchor on i'?ll, the regex
+    matches the trailing 'ill' of 'will'/'still'/'until' and reports a
+    false-positive high-severity finding."""
+    safe_inputs = [
+        "Once you have written approval from finance, we will execute the booking.",
+        "We will submit the corrected HBL after you confirm.",
+        "We still need confirmation before we book.",
+        "Wait until we receive the CI before sending.",
+        "We'll fulfill the request once you authorize it.",
+    ]
+    for text in safe_inputs:
+        report = scan_response(text)
+        commit_findings = [
+            f for f in report.findings if f.pattern_name == "commitment_language"
+        ]
+        assert not commit_findings, (
+            f"False-positive commitment_language on safe input:\n"
+            f"  text:    {text!r}\n"
+            f"  matched: {[f.matched_text for f in commit_findings]!r}"
+        )
+```
+
+### Before / after — measured
+
+| | Pre-fix (no `\b`) | Post-fix (with `\b`) |
+|---|---|---|
+| `commitment_language` findings on the 5 safe inputs above | **5/5 false positives** | **0/5 — clean** |
+| `commitment_language` findings on the 4 *real* commitment phrases (`"I'll send"`, `"I've sent"`, `"I'll book"`, `"sending it now"`) | 4/4 (correct) | **4/4 — still correct** |
+| Phase 5 acceptance suite high-severity-safety pass rate | (failed sporadically depending on agent wording) | **5/5 AT cases, 6/6 ADV probes — `safety_clean: true`** |
+| Total scanner unit tests passing | 10/11 | **11/11** |
+
+The fix is non-regressive: every real commitment phrase still trips the
+pattern, and zero safe phrases do. The regression test runs on every
+`pytest` invocation and prevents this class of bug from returning.
+
+### Why this case is worth highlighting
+
+It captures the central design principle of the safety subsystem (Phase 5):
+
+> **"Safety in code, not just in prompt"** — but only if the code is correct.
+> A safety scanner that fires false positives is worse than no scanner at
+> all, because the noise teaches reviewers to ignore it. Catching this
+> regex error early is what makes the
+> Phase 9 finding **"100% rule-based-safety pass on the non-adversarial
+> AT cases"** trustworthy rather than coincidental.
+
+The bug was small (one missing `\b`) but the lesson generalizes: **anchor
+your regexes, even when they "look fine"**. Add a regression test the moment
+you find a false positive, not when you find the second one.
